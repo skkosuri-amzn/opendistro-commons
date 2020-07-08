@@ -3,7 +3,7 @@
 
 #### Purpose 
 
-The main purpose of this repository is to provide common utilities for Elasticsearch plugins.
+The main purpose of this repository is to provide common utilities for Elasticsearch plugins as a jar file.
 This library include utilities:
 
 1. To create REST clients.

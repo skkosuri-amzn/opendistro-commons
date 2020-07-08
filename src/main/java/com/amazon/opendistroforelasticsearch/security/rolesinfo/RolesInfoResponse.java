@@ -69,6 +69,6 @@ public class RolesInfoResponse extends ActionResponse implements ToXContentObjec
     }
 
     public String getRolesString() {
-        return (roles == null) ? "" : String.join(",", roles);
+        return (roles.size() == 0) ? "" : String.join(",", roles);
     }
 }

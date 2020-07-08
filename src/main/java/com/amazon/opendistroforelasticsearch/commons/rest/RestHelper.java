@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * Sample usage:
  *  RestHelper restHelper = new RestHelper(settings);
- *  RestClient restClient = restHelper.createRestClientBuilder().build();
+ *  RestClient restClient = r   estHelper.createRestClientBuilder().build();
  *
  *  Request request = new Request("GET",  String.format("/%s/_search?q=ERROR", index));
  *  RequestOptions.Builder builder = restHelper.getDefaultRequestOptions().toBuilder();

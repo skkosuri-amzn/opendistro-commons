@@ -12,6 +12,49 @@ import static com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPEN
  * For background jobs usage only. Roles injection can be done using transport layer only.
  * You can't inject roles using REST api.
  *
+ * Java example Usage:
+ *
+ *      try (RoleInjectorHelper roleInjectorHelper = new RoleInjectorHelper(id,
+ *                                      settings, client.threadPool().getThreadContext())) {
+ *
+ *          //add roles to be injected from the configuration.
+ *          roleInjectorHelper.injectRoles("role_1,role_2");
+ *
+ *          //Elasticsearch calls that needs to executed in security context.
+ *
+ *          SearchRequestBuilder searchRequestBuilder = client.prepareSearch(monitor.indexpattern);
+ *          SearchResponse searchResponse = searchRequestBuilder
+ *                             .setFrom(0).setSize(100).setExplain(true).  execute().actionGet();
+ *
+ *      } catch (final ElasticsearchSecurityException ex){
+ *            //handle the security exception
+ *      }
+ *
+ * Kotlin usage with Coroutines:
+ *
+ *    //You can also use launch, based on usecase.
+ *    runBlocking(RolesInjectorContextElement(monitor.id, settings, threadPool.threadContext, monitor.associatedRoles)) {
+ *       //Elasticsearch calls that needs to executed in security context.
+ *    }
+ *
+ *    class RolesInjectorContextElement(val id: String, val settings: Settings, val threadContext: ThreadContext, val roles: String)
+ *     : ThreadContextElement<Unit> {
+ *
+ *     companion object Key : CoroutineContext.Key<RolesInjectorContextElement>
+ *     override val key: CoroutineContext.Key<*>
+ *         get() = Key
+ *
+ *     var rolesInjectorHelper = RoleInjectorHelper(id, settings, threadContext)
+ *
+ *     override fun updateThreadContext(context: CoroutineContext) {
+ *         rolesInjectorHelper.injectRoles(roles)
+ *     }
+ *
+ *     override fun restoreThreadContext(context: CoroutineContext, oldState: Unit) {
+ *         rolesInjectorHelper.close()
+ *     }
+ *   }
+ *
  */
 public class RoleInjectorHelper implements AutoCloseable {
 

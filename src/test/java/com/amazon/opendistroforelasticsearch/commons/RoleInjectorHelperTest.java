@@ -37,19 +37,18 @@ public class RoleInjectorHelperTest {
         assertEquals("1", threadContext.getHeader("default"));
         assertEquals("opendistro", threadContext.getHeader("name"));
         assertEquals("plugin", threadContext.getTransient("ctx.name"));
-        for(int i=0; i < 1; i++) {
-            try (RoleInjectorHelper helper = new RoleInjectorHelper("test-name", settings, threadContext)) {
-                helper.injectRoles("test-role");
-                assertEquals("1", threadContext.getHeader("default"));
-                assertEquals("opendistro", threadContext.getHeader("name"));
-                assertEquals("plugin", threadContext.getTransient("ctx.name"));
-                assertNotNull(threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE));
-                assertEquals("test-role", threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE));
-            }
+
+        try (RoleInjectorHelper helper = new RoleInjectorHelper("test-name", settings, threadContext)) {
+            helper.injectRoles("test-role");
             assertEquals("1", threadContext.getHeader("default"));
             assertEquals("opendistro", threadContext.getHeader("name"));
             assertEquals("plugin", threadContext.getTransient("ctx.name"));
-            assertNull(threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE));
+            assertNotNull(threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE));
+            assertEquals("test-role", threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE));
         }
+        assertEquals("1", threadContext.getHeader("default"));
+        assertEquals("opendistro", threadContext.getHeader("name"));
+        assertEquals("plugin", threadContext.getTransient("ctx.name"));
+        assertNull(threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE));
     }
 }

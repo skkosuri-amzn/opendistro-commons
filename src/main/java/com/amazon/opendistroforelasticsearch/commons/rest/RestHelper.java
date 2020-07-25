@@ -1,11 +1,17 @@
 package com.amazon.opendistroforelasticsearch.commons.rest;
 
 import com.amazon.opendistroforelasticsearch.commons.ConfigConstants;
+import com.amazon.opendistroforelasticsearch.commons.authinfo.AuthInfoRequest;
+import com.amazon.opendistroforelasticsearch.commons.authinfo.AuthInfoResponse;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.common.settings.Settings;
 
@@ -14,6 +20,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -114,5 +121,31 @@ public class RestHelper {
                         return httpClientBuilder.setSSLContext(sslContext);
                     }
                 });
+    }
+
+
+    /**
+     *
+     * @param restClient
+     * @param authInfoRequest
+     * @return
+     * @throws IOException
+     */
+    public final AuthInfoResponse getAuthInfo(RestClient restClient, AuthInfoRequest authInfoRequest) throws IOException {
+        if(!httpSSLEnabled)
+            return new AuthInfoResponse();
+
+        Map<String,String> headers = new HashMap<>();
+        //fixme: how to handle if more than one element.
+        if (authInfoRequest.getAuthTokens() == null || authInfoRequest.getAuthTokens().size() == 0) {
+            throw new IOException("Authorization header is not present");
+        }
+        headers.put(ConfigConstants.AUTHORIZATION, authInfoRequest.getAuthTokens().get(0));
+
+        Request request = new Request("GET", "/_opendistro/_security/authinfo");
+        request.setOptions(getRequestOptions(headers));
+
+        Response response = restClient.performRequest(request);
+        return new AuthInfoResponse(EntityUtils.toString(response.getEntity()));
     }
 }

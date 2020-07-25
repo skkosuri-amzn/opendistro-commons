@@ -54,28 +54,4 @@ public class NodeHelper {
             return new RolesInfoResponse();
         }
     }
-
-    /**
-     *
-     * @param authInfoRequest
-     * @param restClient
-     * @param settings
-     * @return
-     * @throws IOException
-     */
-    public final AuthInfoResponse getAuthInfo(AuthInfoRequest authInfoRequest, RestClient restClient, Settings settings) throws IOException {
-        if(!settings.getAsBoolean(ConfigConstants.OPENDISTRO_SECURITY_SSL_HTTP_ENABLED, false))
-            return new AuthInfoResponse();
-
-        Map<String,String> headers = new HashMap<>();
-        headers.put(ConfigConstants.AUTHORIZATION, authInfoRequest.getAuthTokens().get(0)); //fixme:
-
-        Request request = new Request("GET", "/_opendistro/_security/authinfo");
-        request.setOptions(RequestOptions.DEFAULT.toBuilder()
-                .addHeader(ConfigConstants.CONTENT_TYPE, ConfigConstants.CONTENT_TYPE_DEFAULT)
-                .addHeader(ConfigConstants.AUTHORIZATION, authInfoRequest.getAuthTokens().get(0)));
-
-        Response response = restClient.performRequest(request);
-        return new AuthInfoResponse(EntityUtils.toString(response.getEntity()));
-    }
 }

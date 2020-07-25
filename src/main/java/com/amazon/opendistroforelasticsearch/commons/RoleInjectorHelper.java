@@ -5,8 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 
-import static com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPENDISTRO_SECURITY_INJECT_ROLE;
-import static com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPENDISTRO_SECURITY_INJECT_ROLE_ENABLED;
+import static com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPENDISTRO_SECURITY_INJECTED_ROLES;
+import static com.amazon.opendistroforelasticsearch.commons.ConfigConstants.OPENDISTRO_SECURITY_INJECTED_ROLES_ENABLED;
+
 
 /**
  * For background jobs usage only. Roles injection can be done using transport layer only.
@@ -76,7 +77,7 @@ public class RoleInjectorHelper implements AutoCloseable {
     }
 
     private boolean isEnabled() {
-        return "true".equals(settings.get(OPENDISTRO_SECURITY_INJECT_ROLE_ENABLED));
+        return "true".equals(settings.get(OPENDISTRO_SECURITY_INJECTED_ROLES_ENABLED));
     }
 
     public void injectRoles(String injectRole) {
@@ -84,8 +85,8 @@ public class RoleInjectorHelper implements AutoCloseable {
             return;
         }
 
-        if(threadContext.getTransient(OPENDISTRO_SECURITY_INJECT_ROLE) == null) {
-            threadContext.putTransient(OPENDISTRO_SECURITY_INJECT_ROLE, injectRole);
+        if(threadContext.getTransient(OPENDISTRO_SECURITY_INJECTED_ROLES) == null) {
+            threadContext.putTransient(OPENDISTRO_SECURITY_INJECTED_ROLES, injectRole);
             log.debug("{}, RoleInjectorHelper - inject roles: {}", Thread.currentThread().getName(), id);
         } else {
             log.error("{}, RoleInjectorHelper- most likely thread context corruption : {}",
